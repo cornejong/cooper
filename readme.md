@@ -1,8 +1,8 @@
 # cooper
 
-HTTP/1.1 protocol upgrades for Go. Server and client side.
+Simple HTTP hijacking for Go.
 
-You get the `101 Switching Protocols` handshake, buffered byte handling, and a `net.Conn` back. That's it.
+Does the `101 Switching Protocols` handshake, deals with buffered bytes, and gives you a `net.Conn`. That's it.
 
 ```sh
 go get github.com/cornejong/cooper
@@ -54,3 +54,7 @@ There's a 10 second timeout on the handshake. If the server doesn't respond with
 ## Buffered bytes
 
 Go's HTTP server (and `bufio.Reader` on the client side) might read past the end of the handshake into your protocol data. Cooper handles this internally with a `prefixConn` wrapper that drains those buffered bytes first before reading from the underlying connection. You don't need to think about it.
+
+---
+
+*Named after [D.B. Cooper](https://en.wikipedia.org/wiki/D._B._Cooper) — who also hijacked a connection and was never seen again.*
