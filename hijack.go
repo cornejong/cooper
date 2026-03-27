@@ -115,3 +115,27 @@ func Hijack(handler HijackHandler, protos ...string) http.Handler {
 		}()
 	})
 }
+
+// HTTPHijacker is a convenience http.Handler that bridges a HijackHandler
+// to the cooper.Hijack upgrade flow. It performs the HTTP/1.1 101 handshake
+// and delegates the resulting raw connection to the underlying handler.
+type HTTPHijacker struct {
+	handler HijackHandler
+}
+
+// NewHTTPHijacker returns an HTTPHijacker that will delegate upgraded
+// connections to handler. It panics if handler is nil.
+func NewHTTPHijacker(handler HijackHandler) *HTTPHijacker {
+	if handler == nil {
+		panic("cooper: nil HijackHandler passed to NewHTTPHijacker")
+	}
+
+	return &HTTPHijacker{handler: handler}
+}
+
+// ServeHTTP implements http.Handler by initiating a protocol upgrade for the
+// "dbro/0" protocol and handing the hijacked connection to the underlying
+// HijackHandler.
+func (h *HTTPHijacker) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	Hijack(h.handler, "dbro/0").ServeHTTP(w, r)
+}
